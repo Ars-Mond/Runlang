@@ -1,0 +1,67 @@
+name: PreRelease
+
+on:
+  push:
+    tags:
+      - 'v*.pre'
+
+jobs:
+  release:
+    name: Create release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.release.outputs.upload_url }}
+    steps:
+      - name: Create release
+        id: release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Runlang.App-RPE-${{ github.ref }}
+          prerelease: true
+
+  build:
+    name: Release
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Get Tag
+      shell: bash
+      run: |
+        echo "TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+        
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16.x
+        cache: 'npm'
+ 
+    - name: Build
+      shell: bash
+      run: |
+          release_name="Runlang.App-RPE-${{ env.TAG }}"
+          
+          npm install @vue/cli
+          npm install
+          
+          # Build everything
+          npm run build
+          
+          # Pack files        
+          7z a -tzip "${release_name}.zip" "./dist/*"
+  
+          # Delete output directory
+          rm -r "dist"
+          
+    - name: Upload
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.release.outputs.upload_url }}
+        asset_path: Runlang.App-RPE-${{ env.TAG }}.zip
+        asset_name: Runlang.App-RPE-${{ env.TAG }}.zip
+        asset_content_type: application/zip
