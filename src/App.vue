@@ -8,12 +8,8 @@
       <router-view />
     </div>
   </header>
-  <main>
-
-  </main>
-  <footer>
-
-  </footer>
+  <main></main>
+  <footer></footer>
 </template>
 
 <style lang="less">
