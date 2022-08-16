@@ -44,7 +44,7 @@ jobs:
       run: |
           release_name="Runlang.App-${{ env.TAG }}"
           
-          npm install -g @vue/cli
+          npm install @vue/cli
           npm install
           
           # Build everything
