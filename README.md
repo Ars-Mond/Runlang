@@ -23,6 +23,6 @@ npm run lint
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
-И не только...
+И не только... 2
 
 
